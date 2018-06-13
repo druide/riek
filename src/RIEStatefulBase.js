@@ -26,7 +26,10 @@ export default class RIEStatefulBase extends RIEBase {
             this.commit(newValue);
         }
         if(!result && this.props.handleValidationFail) {
-            this.props.handleValidationFail(result, newValue, () => this.cancelEditing());
+            this.props.handleValidationFail(result, newValue, () => {
+                if (this.props.shouldRemainWhileInvalid) return this.setState({invalid: true})
+                return this.cancelEditing()
+            });
         } else {
             this.cancelEditing();
         }
@@ -40,7 +43,10 @@ export default class RIEStatefulBase extends RIEBase {
 
     keyDown = (event) => {
         debug('keyDown(${event.keyCode})')
-        if(event.keyCode === 13) { this.finishEditing() }           // Enter
+        if(event.keyCode === 13) {
+            event.preventDefault()
+            this.finishEditing()
+        } // Enter
         else if (event.keyCode === 27) { this.cancelEditing() }     // Escape
     };
 
